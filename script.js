@@ -1,90 +1,106 @@
-const goods = [
-  { title: 'Shirt', price: 150 },
-  { title: 'Socks', price: 50 },
-  { title: 'Jacket', price: 350 },
-  { title: 'Shoes', price: 250 }
-]
+const API_URL =  "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses"
 
+class GoodsItem {
+  constructor(title, price, id){
+    this.title = title
+    this.price = price
+    this.id = id
+  }
 
-const renderGoodsItem = (title='title', price='price') => {
-  return `<div class="goods-item"><h3>${title}</h3><p>${price}</p></div>`
+  render() {
+    return `<div class="goods-item" itemId=${this.id}><h3>${this.title}</h3><p>${this.price}</p><button class="add-button" type="button" id=${this.id}>Добавить в корзину</button></div>`
+  }
 }
 
-const renderGoodsList = list => {
-  let goodsList = list.map(item => renderGoodsItem(item.title, item.price)).join("")
-
-
-  document.querySelector('.goods-list').innerHTML = goodsList
-}
 
 class GoodsList {
   constructor(){
     this.goods = []
+    this.filteredGoods =[]
   }
-  fetchGoods() {
-    this.goods = [
-      { title: 'Shirt', price: 150 },
-      { title: 'Socks', price: 50 },
-      { title: 'Jacket', price: 350 },
-      { title: 'Shoes', price: 250 },
-    ];
+  async fetchGoods() {
+    const responce = await fetch(`${API_URL}/catalogData.json`);
+    if (responce.ok) {
+      const catalogItems = await responce.json();
+      this.goods = catalogItems;
+      this.filteredGoods= catalogItems
+    } else {
+      alert("Ошибка при соединении с сервером");
+    }
   }
+
+  filterGoods(value) {
+    const regExp = new RegExp(value, 'i')
+    this.filteredGoods = this.goods.filter(good => regExp.test(good.product_name))
+    this.render()
+  }
+
   render() {
-    let listHtml = '';
-    this.goods.forEach(good => {
-      const goodItem = new GoodsItem(good.title, good.price);
+    let listHtml = "";
+    this.filteredGoods.forEach((good) => {
+      const goodItem = new GoodsItem(
+        good.product_name,
+        good.price,
+        good.id_product
+      );
       listHtml += goodItem.render();
     });
-    document.querySelector('.goods-list').innerHTML = listHtml;
+    document.querySelector(".goods-list").innerHTML = listHtml;
   }
-  add(basketItem){
-    pass
+}
+class BucketList {
+  constructor(){
+    this.items = []
   }
-  remove(basketItem){
-    pass
+  addItem(title, price, id){
+    let item = new BucketItem(title, price, id)
+    this.items.push(item)
   }
-  removeAll(){
-    pass
-  }
-  edit(basketItem){
-    pass
-  }
-  order(){
-    pass
+  removeItem(item){
+    this.items.removeItem(item)
   }
   getAllItems(){
-    pass
+    return this.items
+    
   }
-  getCostBasket(){
-    return this.goods.reduse((sum, item) => sum + item.price, 0)
-  }
+  
+
 }
-
-
-class GoodsItem {
-  constructor(title, price, count){
+class BucketItem {
+  constructor(title, price, id){
     this.title = title
     this.price = price
-    this.count = count
+    this.id = id
   }
-  add(this){
-    pass
-  }
-  remove(this){
-    pass
-  }
-  edit(this){
-    pass
-  }
-  render() {
-    return `<div class="goods-item"><h3>${this.title}</h3><p>${this.price}</p></div>`;
-  }
+  
 }
 
-const init = () => {
-  renderGoodsList(goods)
-}
+const init = async () => {
+  const list = new GoodsList();
+  await list.fetchGoods();
+  const bucket = new BucketList()
+  console.log(bucket)
+  list.render();
 
-window.onload = init
 
+const searchButton = document.querySelector('.search-button')
+const searchInput = document.querySelector('.goods-search')
+
+searchButton.addEventListener('click', () => {
+  list.filterGoods(searchInput.value)
+})
+const addButton = document.querySelectorAll('.add-button').forEach(button=>
+  button.addEventListener('click', ()=>{
+    bucket.addItem('123', '123', '123')
+    console.log(bucket.getAllItems())
+  })
+)
+const cartButton = document.querySelector('.cart-button')
+  cartButton.addEventListener('click', () => {
+    console.log(bucket.getAllItems())
+  })
+
+};
+
+window.onload = init;
 
