@@ -9,7 +9,9 @@ const app = new Vue({
   data: {
     goods: [],
     filteredGoods: [],
+    busketGoods : [],
     searchLine: '',
+    isVisibleCart: false,
   },
 
   methods: {
@@ -23,6 +25,24 @@ const app = new Vue({
         alert("Ошибка при соединении с сервером");
       }
     },
+
+    filterGoods(value) {
+      const regExp = new RegExp(value, 'i')
+      this.filteredGoods = this.goods.filter(good => regExp.test(good.product_name))
+    },
+
+    searchGoods(){
+     this.filterGoods(this.searchLine)
+    },
+
+    showBusket(){
+      if(this.isVisibleCart == true){
+        this.isVisibleCart = false
+      }
+      else{
+      this.isVisibleCart = true
+      }
+    }
   },
 
   async mounted() {

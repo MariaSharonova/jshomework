@@ -8,9 +8,9 @@
   <body>
     <div id="app">
       <header>
-        <input type="text" class="goods-search" />
-        <button class="search-button" type="button">Искать</button>
-        <button class="cart-button" type="button">Корзина</button>
+        <input type="text" class="goods-search" v-model='searchLine'></input>
+        <button class="search-button" type="button" v-on:click="searchGoods">Искать</button>
+        <button class="cart-button" type="button" v-on:click='showBusket'>Корзина</button>
       </header>
       <main>
         <div class="goods-list">
@@ -19,9 +19,17 @@
             <p>{{good.price}}</p>
           </div>
         </div>
+        <div class="busket-list" v-if='isVisibleCart == true'>
+          <h3>Корзина</h3>
+          <p v-if='busketGoods.length==0'>Нет данных</p>
+          <div class="busket-item" v-for="good in busketGoods">
+            <h3>{{good}}</h3>
+          </div>
+        </div>
       </main>
     </div>
   </body>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
   <script src="script.js"></script>
 </html>
+
