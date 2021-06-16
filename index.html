@@ -8,24 +8,13 @@
   <body>
     <div id="app">
       <header>
-        <input type="text" class="goods-search" v-model='searchLine'></input>
-        <button class="search-button" type="button" v-on:click="searchGoods">Искать</button>
+        <search-goods :searchline="searchLine" :searchgoods="searchGoods"></search-goods>
         <button class="cart-button" type="button" v-on:click='showBusket'>Корзина</button>
+        <busket-list :bgoods="busketGoods" :isvisiblecart="isVisibleCart"></busket-list>
       </header>
       <main>
-        <div class="goods-list">
-          <div class="goods-item" v-for="good in filteredGoods">
-            <h3>{{good.product_name}}</h3>
-            <p>{{good.price}}</p>
-          </div>
-        </div>
-        <div class="busket-list" v-if='isVisibleCart == true'>
-          <h3>Корзина</h3>
-          <p v-if='busketGoods.length==0'>Нет данных</p>
-          <div class="busket-item" v-for="good in busketGoods">
-            <h3>{{good}}</h3>
-          </div>
-        </div>
+        <disconnect :isconnect="isConnect"></disconnect>
+        <goods-list :goods="filteredGoods"></goods-list>
       </main>
     </div>
   </body>
