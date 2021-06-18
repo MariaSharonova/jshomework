@@ -8,17 +8,24 @@
   <body>
     <div id="app">
       <header>
-        <search-goods :searchline="searchLine" :searchgoods="searchGoods"></search-goods>
-        <button class="cart-button" type="button" v-on:click='showBusket'>Корзина</button>
-        <busket-list :bgoods="busketGoods" :isvisiblecart="isVisibleCart"></busket-list>
+        <header-component v-model="searchLine"></header-component>
       </header>
       <main>
-        <disconnect :isconnect="isConnect"></disconnect>
         <goods-list :goods="filteredGoods"></goods-list>
+         
+      <button class="cart-button" v-on:click="addToBasket(goods.id_product)" type="button">Добавить</button>
+        <div class="basket-list" v-if="isVisibleCart !== false">
+          <h3>Корзина</h3>
+          <div class="basket-item" v-for="good in filteredBasket">
+            <h3>{{good.product_name}}</h3>
+            <p>{{good.price}}</p>
+            <p>Количество {{good.quantity}}</p>
+            <button class="cart-button" v-on:click="deleteFromBasket(good.id_product)" type="button">Удалить</button>
+          </div>
+        </div>
       </main>
     </div>
   </body>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
   <script src="script.js"></script>
 </html>
-

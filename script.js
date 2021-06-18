@@ -2,72 +2,93 @@ const API_URL =
   "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
 
 
-console.log(window)
 
 Vue.component('goods-list', {
   props: ['goods'],
   template: `
-  <div class="goods-list">
-    <goods-item v-for="good in goods" :good="good" :key="good.product_name"></goods-item>
-  </div>
+    <div class="goods-list">
+      <goods-item v-for="goodEntity in goods" :goodProp="goodEntity"> </goods-item>
+    </div>
   `
-});
+})
 
 Vue.component('goods-item', {
-  props: ['good'],
+  props: ['goodProp'],
   template: `
     <div class="goods-item">
-      <h3>{{ good.product_name }}</h3>
-      <p>{{ good.price }}</p>
+      <h3>{{goodProp.product_name}}</h3>
+      <p>{{goodProp.price}}</p>
+      <button class="cart-button" v-on:click="addToBasket('name')" type="button">Добавить</button>
+    </div>
+  `,
+  methods:{
+    addToBasket: function() {
+      this.$root.addToBasket(this.goodProp.id_product);
+    }
+  }
+})
+
+
+Vue.component('basket-list',{
+  props: ['basket'],
+  template: `
+    <div class="basket-list">
+      <basket-item v-for="basketEntity in basket" :basketProp="basketEntity"> </basket-item>
     </div>
   `
-});
+})
 
-Vue.component('search-goods', {
-    props: ['searchline', 'searchgoods'],
-    template: `
-    <div>
-      <input type="text" class="goods-search" v-model="searchline">
-      </input>
-      <button class="search-button" type="button" v-on:click="searchgoods">
-      Искать
-      </button>
+Vue.component('basket-item',{
+  props: ['basketProp'],
+  template: `
+    <div class="basket-list" v-if="isVisibleCart !== false">
+      <h3>Корзина</h3>
+      <div class="basket-item">
+        <h3>{{basketProp.product_name}}</h3>
+        <p>{{basketProp.price}}</p>
+        <<p>Количество {{basketProp.quantity}}</p>
+        <button class="cart-button" v-on:click="deleteFromBasket(basketProp.id_product)" type="button">Удалить</button>
+      </div>
     </div>
-    `
+  `,
+  methods:{
+    addToBasket: function() {
+      this.$root.deleteFromBasket();
+    }
   }
-);
+})
 
-Vue.component('busket-list', {
-  props: ['isvisiblecart', 'bgoods'],
+Vue.component('header-component', {
+  props: ['value'],
   template: `
-  <div class="busket-list" v-if='isvisiblecart == true'>
-    <h3>Корзина</h3>
-    <p v-if='bgoods.length==0'>Нет данных</p>
-    <div class="busket-item" v-for="good in bgoods">
-      <h3>{{good}}</h3>
+    <div>
+         <input
+        v-bind:value="value"
+        v-on:input="$emit('input', $event.target.value)"
+      >
+      <button class="search-button" v-on:click="FilterGoods" type="button">Искать</button>
+      <button class="cart-button" v-on:click="onClickViewCart" type="button">Корзина</button>
     </div>
-  </div>
+    
   `,
-});
-
-Vue.component('disconnect', {
-  props: ['isconnect'],
-  template: `
-  <div class="busket-list" v-if='isconnect == false'>
-    <p>Нет соединения</p>
-  </div>
-  `,
-});
+  methods:{
+    FilterGoods: function() {
+      this.$root.FilterGoods();
+    },
+    onClickViewCart: function() {
+      this.$root.onClickViewCart();
+    }
+  }
+})
 
 const app = new Vue({
   el: "#app",
   data: {
     goods: [],
     filteredGoods: [],
-    busketGoods : [],
-    searchLine: '11',
+    searchLine: '',
+    filteredBasket: [],
     isVisibleCart: false,
-    isConnect: true,
   },
 
   methods: {
@@ -78,32 +99,72 @@ const app = new Vue({
         this.goods = catalogItems;
         this.filteredGoods = catalogItems;
       } else {
-        this.isConnect = false;
         alert("Ошибка при соединении с сервером");
       }
     },
 
-    filterGoods(value) {
-      const regExp = new RegExp(value, 'i')
-      this.filteredGoods = this.goods.filter(good => regExp.test(good.product_name))
+    FilterGoods()  {
+      let text = this.searchLine;
+      if (text === '') {
+          this.filteredGoods = this.goods;
+      } else {
+          this.filteredGoods = this.goods.filter((el) => {
+              return el.product_name.includes(text);
+          });
+      };
     },
 
-    searchGoods(){
-     this.filterGoods(this.searchLine)
+    onClickViewCart() {
+      switch(this.isVisibleCart) {
+        case(false):
+            this.isVisibleCart = true;
+            break;
+        case(true):
+            this.isVisibleCart = false;
+            break;
+      }
     },
 
-    showBusket(){
-      if(this.isVisibleCart == true){
-        this.isVisibleCart = false
+    addToBasket(id) {
+      let toBasket;
+      this.goods.forEach((item)=> {
+        if(id == item.id_product) {
+          toBasket = {
+            id_product: item.id_product,
+            product_name: item.product_name,
+            price: item.price,
+            quantity: 1,
+          }
+        }
+      });
+      if(this.filteredBasket.length === 0 ){
+        this.filteredBasket.push(toBasket);
+      } else{basketCheck = true
+        this.filteredBasket.forEach(function(item) {
+          if(toBasket.id_product === item.id_product) {
+              basketCheck = false;
+              item.quantity += 1
+          } 
+        });
+        if(basketCheck === true){
+          this.filteredBasket.push(toBasket);
+        } 
       }
-      else{
-      this.isVisibleCart = true
-      }
-    }
+    },
+
+    deleteFromBasket(id) {
+      this.filteredBasket.forEach(function(item) {
+        if(id === item.id_product) {
+            item.quantity -= 1
+        } 
+      });
+      this.filteredBasket = this.filteredBasket.filter((el) => {
+         return el.quantity > 0;
+      });
+    },
   },
 
   async mounted() {
     await this.getProducts()
   }
 });
-
