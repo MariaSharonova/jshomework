@@ -1,0 +1,31 @@
+.goods-list {
+    border: 2px solid #FF6A6A;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-decoration: none;
+}
+
+.goods-item {
+    border: 1px solid #F26376;
+    background-color: beige;
+    width: 150px;
+    box-sizing: border-box;
+    padding: 0px 20px;
+    margin: 10px auto 10px auto;
+}
+
+.menu{
+    border: 2px solid gray;
+    margin-bottom: 50px;
+}
+
+.cart-button, .search-button{
+    font-size: 16px;
+    line-height: 19px;
+    color: #F26376;
+    border: 1px solid #FF6A6A;
+    padding: 14px 38px;
+    margin: 18px;
+    background-color: beige;
+}
