@@ -3,84 +3,6 @@ const API_URL =
 
 
 
-Vue.component('goods-list', {
-  props: ['goods'],
-  template: `
-    <div class="goods-list">
-      <goods-item v-for="goodEntity in goods" :goodProp="goodEntity"> </goods-item>
-    </div>
-  `
-})
-
-Vue.component('goods-item', {
-  props: ['goodProp'],
-  template: `
-    <div class="goods-item">
-      <h3>{{goodProp.product_name}}</h3>
-      <p>{{goodProp.price}}</p>
-      <button class="cart-button" v-on:click="addToBasket('name')" type="button">Добавить</button>
-    </div>
-  `,
-  methods:{
-    addToBasket: function() {
-      this.$root.addToBasket(this.goodProp.id_product);
-    }
-  }
-})
-
-
-Vue.component('basket-list',{
-  props: ['basket'],
-  template: `
-    <div class="basket-list">
-      <basket-item v-for="basketEntity in basket" :basketProp="basketEntity"> </basket-item>
-    </div>
-  `
-})
-
-Vue.component('basket-item',{
-  props: ['basketProp'],
-  template: `
-    <div class="basket-list" v-if="isVisibleCart !== false">
-      <h3>Корзина</h3>
-      <div class="basket-item">
-        <h3>{{basketProp.product_name}}</h3>
-        <p>{{basketProp.price}}</p>
-        <<p>Количество {{basketProp.quantity}}</p>
-        <button class="cart-button" v-on:click="deleteFromBasket(basketProp.id_product)" type="button">Удалить</button>
-      </div>
-    </div>
-  `,
-  methods:{
-    addToBasket: function() {
-      this.$root.deleteFromBasket();
-    }
-  }
-})
-
-Vue.component('header-component', {
-  props: ['value'],
-  template: `
-    <div>
-         <input
-        v-bind:value="value"
-        v-on:input="$emit('input', $event.target.value)"
-      >
-      <button class="search-button" v-on:click="FilterGoods" type="button">Искать</button>
-      <button class="cart-button" v-on:click="onClickViewCart" type="button">Корзина</button>
-    </div>
-    
-  `,
-  methods:{
-    FilterGoods: function() {
-      this.$root.FilterGoods();
-    },
-    onClickViewCart: function() {
-      this.$root.onClickViewCart();
-    }
-  }
-})
-
 const app = new Vue({
   el: "#app",
   data: {
@@ -90,6 +12,7 @@ const app = new Vue({
     filteredBasket: [],
     isVisibleCart: false,
   },
+
 
   methods: {
     async getProducts() {
@@ -163,8 +86,10 @@ const app = new Vue({
       });
     },
   },
+  
 
   async mounted() {
     await this.getProducts()
   }
 });
+
